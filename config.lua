@@ -21,6 +21,16 @@ vim.g.neovide_cursor_vfx_mode = "railgun"
 vim.g.neovide_transparency = 0.8
 vim.g.neovide_fullscreen = true
 vim.g.neovide_input_use_logo = true
+-- lua project.nvim
+vim.g.nvim_tree_respect_buf_cwd = 1
+
+require("nvim-tree").setup({
+  update_cwd = true,
+  update_focused_file = {
+    enable = true,
+    update_cwd = true
+  },
+})
 
 -- general
 lvim.log.level = "warn"
@@ -66,6 +76,13 @@ lvim.builtin.which_key.mappings["t"] = {
   l = { "<cmd>Trouble loclist<cr>", "LocationList" },
   w = { "<cmd>Trouble lsp_workspace_diagnostics<cr>", "Diagnostics" },
 }
+lvim.builtin.which_key.mappings["h"] = {
+  name = "+Hop",
+  s = { "<cmd>HopChar2<cr>", "HopChar2" },
+  S = { "<cmd>HopWord<cr>", "HopWord" },
+  l = { "<cmd>HopLine<cr>", "HopLine" },
+  p = { "<cmd>HopPattern<cr>", "HopPattern" },
+}
 
 -- TODO: User Config for predefined plugins
 -- After changing plugin config exit and reopen LunarVim, Run :PackerInstall :PackerCompile
@@ -78,6 +95,9 @@ lvim.builtin.dap.active = true
 lvim.builtin.notify.active = true
 lvim.builtin.gitsigns.opts.linehl = true
 lvim.builtin.gitsigns.opts.numhl = true
+lvim.builtin.project.active = true
+lvim.builtin.project.silent_chdir = false
+lvim.builtin.project.manual_mode = true
 
 -- if you don't want all the parsers change this to a table of the ones you want
 lvim.builtin.treesitter.ensure_installed = {
@@ -209,6 +229,72 @@ lvim.plugins = {
         "Gedit"
       },
       ft = {"fugitive"}
+    },
+    {
+      "phaazon/hop.nvim",
+      event = "BufRead",
+      config = function()
+        require("hop").setup()
+        -- vim.api.nvim_set_keymap("f", "s", ":HopChar2<cr>", { silent = true })
+        -- vim.api.nvim_set_keymap("f", "S", ":HopWord<cr>", { silent = true })
+        -- vim.api.nvim_set_keymap("f", "l", ":HopLine<cr>", { silent = true })
+        -- vim.api.nvim_set_keymap("f", "/", ":HopLine<cr>", { silent = true })
+      end,
+    },
+    {
+      "npxbr/glow.nvim",
+      ft = {"markdown"}
+      -- run = "yay -S glow"
+    },
+    {
+      "karb94/neoscroll.nvim",
+      event = "WinScrolled",
+      config = function()
+      require('neoscroll').setup({
+            -- All these keys will be mapped to their corresponding default scrolling animation
+            mappings = {'<C-u>', '<C-d>', '<C-b>', '<C-f>',
+            '<C-y>', '<C-e>', 'zt', 'zz', 'zb'},
+            hide_cursor = true,          -- Hide cursor while scrolling
+            stop_eof = true,             -- Stop at <EOF> when scrolling downwards
+            use_local_scrolloff = false, -- Use the local scope of scrolloff instead of the global scope
+            respect_scrolloff = false,   -- Stop scrolling when the cursor reaches the scrolloff margin of the file
+            cursor_scrolls_alone = true, -- The cursor will keep on scrolling even if the window cannot scroll further
+            easing_function = nil,        -- Default easing function
+            pre_hook = nil,              -- Function to run before the scrolling animation starts
+            post_hook = nil,              -- Function to run after the scrolling animation ends
+            })
+      end
+    },
+	{
+		"ethanholz/nvim-lastplace",
+		event = "BufRead",
+		config = function()
+			require("nvim-lastplace").setup({
+				lastplace_ignore_buftype = { "quickfix", "nofile", "help" },
+				lastplace_ignore_filetype = {
+					"gitcommit", "gitrebase", "svn", "hgcommit",
+				},
+				lastplace_open_folds = true,
+			})
+		end,
+	},
+    {
+      "rmagatti/goto-preview",
+      config = function()
+      require('goto-preview').setup {
+            width = 120; -- Width of the floating window
+            height = 25; -- Height of the floating window
+            default_mappings = true; -- Bind default mappings
+            debug = false; -- Print debug information
+            opacity = nil; -- 0-100 opacity level of the floating window where 100 is fully transparent.
+            post_open_hook = nil -- A function taking two arguments, a buffer and a window to be ran as a hook.
+            -- You can use "default_mappings = true" setup option
+            -- Or explicitly set keybindings
+            -- vim.cmd("nnoremap gpd <cmd>lua require('goto-preview').goto_preview_definition()<CR>")
+            -- vim.cmd("nnoremap gpi <cmd>lua require('goto-preview').goto_preview_implementation()<CR>")
+            -- vim.cmd("nnoremap gP <cmd>lua require('goto-preview').close_all_win()<CR>")
+        }
+      end
     },
 }
 
